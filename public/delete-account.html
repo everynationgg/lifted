@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIFTED — Account &amp; Data Deletion Request</title>
+  <style>
+    :root {
+      --bg: #F0F9FF;
+      --card-bg: #FFFFFF;
+      --primary: #0284C7;
+      --text: #0F172A;
+      --muted: #475569;
+      --border: #BAE6FD;
+      --danger: #BE123C;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 24px 16px;
+    }
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+      border: 1px solid var(--border);
+    }
+    h1 {
+      color: var(--primary);
+      font-size: 1.5rem;
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 1.15rem;
+      color: var(--text);
+      margin-top: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    p, li {
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #E0F2FE;
+      color: #0369A1;
+      font-weight: 600;
+      font-size: 0.75rem;
+      margin-bottom: 12px;
+    }
+    .card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    input[type="email"], textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    button {
+      background: var(--primary);
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0369A1;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #E2E8F0;
+      font-size: 0.75rem;
+      color: #94A3B8;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="badge">Google Play Data Safety &amp; Privacy Compliance</span>
+    <h1>LIFTED — Account &amp; Data Deletion Request</h1>
+    <p>
+      <strong>Application</strong>: LIFTED (Package: <code>com.lifted.app</code>)<br>
+      <strong>Client / Project Lead</strong>: Cherie Magsanoc (Lifted)<br>
+      <strong>Infrastructure Host</strong>: Every Nation GG
+    </p>
+
+    <h2>1. Data Architecture: Offline Guest vs. Authenticated Account</h2>
+    <p>
+      LIFTED operates on an offline-first, privacy-by-design model:
+    </p>
+    <ul>
+      <li>
+        <strong>Guest Users (Default)</strong>: All reflection journals, prayers, mood records, and breath pacer usage are stored exclusively on your local device within an AES-256-GCM encrypted vault. No records or telemetry are transmitted to our servers.
+      </li>
+      <li>
+        <strong>Authenticated Users</strong>: If you optional sign in via email Magic Link / OTP, your authentication identity (email address, user ID, session tokens) is stored securely by Supabase on behalf of Every Nation GG.
+      </li>
+    </ul>
+
+    <h2>2. How to Delete Your Data</h2>
+
+    <div class="card">
+      <h3 style="margin-top: 0; font-size: 1rem; color: var(--text);">Option A: Delete On-Device Local Data (Immediate)</h3>
+      <p style="margin-bottom: 0;">
+        Open the LIFTED mobile app &rarr; <strong>Journey</strong> &rarr; <strong>Preferences</strong> &rarr; scroll to <strong>Local Device Data Reset</strong> &rarr; tap <strong>Reset Local Data</strong>. This permanently purges your encrypted database, mood history, and settings from the local hardware enclave.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top: 0; font-size: 1rem; color: var(--text);">Option B: Request Deletion of Online Cloud Account &amp; Server Records</h3>
+      <p>
+        If you registered an email account and wish to permanently delete your server-side account, authentication credentials, and associated cloud records, submit your request below:
+      </p>
+
+      <form id="deletion-form" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label for="email">Registered Email Address</label>
+          <input type="email" id="email" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="reason">Reason / Additional Notes (Optional)</label>
+          <textarea id="reason" rows="3" placeholder="Optional details regarding your request"></textarea>
+        </div>
+        <button type="submit" id="btn-submit">Submit Deletion Request</button>
+      </form>
+
+      <div id="confirmation" style="display: none; margin-top: 16px; padding: 12px; background: #DCFCE7; border: 1px solid #86EFAC; border-radius: 8px; color: #166534; font-size: 0.88rem;">
+        Your deletion request has been submitted. The infrastructure administrator (Every Nation GG) will process your account deletion and confirm via email.
+      </div>
+    </div>
+
+    <h2>3. Retention and Processing Commitment</h2>
+    <p>
+      Upon verified receipt of an account deletion request:
+    </p>
+    <ul>
+      <li>Your authentication record in Supabase Auth (<code>auth.users</code>) is permanently deleted.</li>
+      <li>Any role assignments (<code>public.user_roles</code>) and cloud metadata are permanently purged.</li>
+      <li>Local device records are unaffected until purged on-device via Option A.</li>
+    </ul>
+
+    <div class="footer">
+      &copy; 2026 LIFTED • Project Client: Cherie Magsanoc • Infrastructure: Every Nation GG
+    </div>
+  </div>
+
+  <script>
+    function handleSubmit(e) {
+      e.preventDefault();
+      document.getElementById('deletion-form').style.display = 'none';
+      document.getElementById('confirmation').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

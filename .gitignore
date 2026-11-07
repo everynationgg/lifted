@@ -1,0 +1,54 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies and Build Output
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+*.env
+
+# Android Keystores & Signing Keys
+*.keystore
+*.jks
+
+# Mobile Build Artifacts & Packages
+*.apk
+*.aab
+*.apks
+/android/app/build/
+/android/.gradle/
+/android/build/
+/ios/App/Pods/
+/ios/App/build/
+
+# Media & Screen Recordings
+*.mp4
+*.mov
+
+# Quarantined & Temporary Files
+.quarantine/
+*.bak
+*.tmp
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

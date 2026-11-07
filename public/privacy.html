@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIFTED — Privacy Policy</title>
+  <style>
+    :root {
+      --bg: #F0F9FF;
+      --card-bg: #FFFFFF;
+      --primary: #0284C7;
+      --text: #0F172A;
+      --muted: #475569;
+      --border: #BAE6FD;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 24px 16px;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+      border: 1px solid var(--border);
+    }
+    h1 {
+      color: var(--primary);
+      font-size: 1.6rem;
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 1.15rem;
+      color: var(--text);
+      margin-top: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    p, li {
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #E0F2FE;
+      color: #0369A1;
+      font-weight: 600;
+      font-size: 0.75rem;
+      margin-bottom: 12px;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #E2E8F0;
+      font-size: 0.75rem;
+      color: #94A3B8;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="badge">Official Application Privacy Policy</span>
+    <h1>Privacy Policy for LIFTED</h1>
+    <p><strong>Effective Date:</strong> November 1, 2026<br>
+    <strong>Application:</strong> LIFTED (Android Package: <code>com.lifted.app</code>)<br>
+    <strong>Project Client:</strong> Cherie Magsanoc (Lifted)<br>
+    <strong>Infrastructure Host:</strong> Every Nation GG</p>
+
+    <h2>1. Introduction &amp; Core Philosophy</h2>
+    <p>
+      LIFTED is a faith-based mental wellness companion designed for individuals and parents navigating emotional healing. We adhere to a strict <em>privacy-by-design</em> and <em>local-first</em> architecture. You do not need to provide personal identification or create an online account to use LIFTED.
+    </p>
+
+    <h2>2. Data Handling &amp; Storage Architecture</h2>
+    <p>
+      <strong>A. Local Hardware Enclave Encryption:</strong><br>
+      Your personal reflections, prayers, and mood tracking entries are stored exclusively on your device. Field contents are encrypted using AES-256-GCM authenticated encryption. On native Android devices, data is stored in local app storage.
+    </p>
+    <p>
+      <strong>B. Sanctuary Privacy Lock:</strong><br>
+      The application provides an optional Sanctuary Lock that utilizes your device's native biometric prompt (Fingerprint / Face Unlock) or system device credential (PIN / Pattern) to gate access to the user interface. Biometric templates remain securely within your device's hardware security module and are never accessible to LIFTED.
+    </p>
+    <p>
+      <strong>C. Zero Cloud Synchronization in Current Release (v1.0.0):</strong><br>
+      Cloud synchronization is inactive by default in version 1.0.0. Your journals, prayers, and emotional logs remain 100% on your physical handset and are never transmitted to external cloud servers.
+    </p>
+
+    <h2>3. Optional Online Features &amp; Authentication</h2>
+    <p>
+      If you choose to sign in to optional cloud services using email Magic Link / One-Time Password (OTP):
+    </p>
+    <ul>
+      <li>Your email address is transmitted securely to our backend infrastructure hosted on Supabase (managed by Every Nation GG) solely for authentication and session issuance.</li>
+      <li>Your personal reflections and prayer history remain on-device and are not automatically uploaded upon sign-in.</li>
+    </ul>
+
+    <h2>4. Crisis Support &amp; Hotline Resources</h2>
+    <p>
+      The application includes country-specific crisis helpline directories (e.g., Philippines 911 / NCMH 1553, US 988 Lifeline). All crisis directory data is bundled offline within the application. Dialing a helpline initiates a standard telephone call through your device's native phone dialer; LIFTED records zero telemetry regarding emergency helpline usage.
+    </p>
+
+    <h2>5. Third-Party Services, SDKs &amp; Advertising</h2>
+    <p>
+      LIFTED does not contain third-party advertising networks, commercial tracking SDKs, or analytics trackers. We do not sell, rent, or monetize your personal information.
+    </p>
+
+    <h2>6. Account &amp; Data Deletion Rights</h2>
+    <p>
+      Under Google Play Data Safety standards, you maintain the complete right to delete your data:
+    </p>
+    <ul>
+      <li><strong>Local Data Reset:</strong> You can purge all on-device reflections, prayers, and cached data at any time via <em>Journey &rarr; Preferences &rarr; Local Device Data Reset</em>.</li>
+      <li><strong>Online Account Deletion:</strong> If you registered an email account, you can submit a deletion request via our <a href="delete-account.html">Account &amp; Data Deletion Request Page</a>.</li>
+    </ul>
+
+    <h2>7. Policy Updates &amp; Contact</h2>
+    <p>
+      Any updates to this privacy policy will be posted to this page and announced in application release notes.<br>
+      For questions regarding this policy or data safety inquiries, contact the application administrators via the Every Nation GG infrastructure team or through the account deletion request form.
+    </p>
+
+    <div class="footer">
+      &copy; 2026 LIFTED • Project Client: Cherie Magsanoc • Infrastructure: Every Nation GG
+    </div>
+  </div>
+</body>
+</html>

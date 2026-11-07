@@ -1,0 +1,53 @@
+{
+  "name": "visien-1st-proj",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "preview": "vite preview",
+    "cap:sync": "cap sync",
+    "android:apk": "npm run build && cap sync android && cd android && gradlew.bat assembleDebug",
+    "android:release": "npm run build && cap sync android && cd android && gradlew.bat assembleRelease",
+    "android:bundle": "npm run build && cap sync android && cd android && gradlew.bat bundleRelease",
+    "android:open": "cap open android",
+    "ios:open": "cap open ios"
+  },
+  "dependencies": {
+    "@aparajita/capacitor-biometric-auth": "^10.0.0",
+    "@aparajita/capacitor-secure-storage": "^8.0.1",
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor-community/sqlite": "^8.1.1",
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/cli": "^7.6.9",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.5.3",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/network": "^8.0.1",
+    "@supabase/supabase-js": "^2.109.0",
+    "idb": "^8.0.4",
+    "lucide-react": "^1.52.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "fake-indexeddb": "^6.2.7",
+    "jsdom": "^29.1.1",
+    "oxlint": "^1.81.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^4.1.12"
+  }
+}

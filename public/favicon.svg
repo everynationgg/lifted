@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <!-- Sky background circle -->
+  <circle cx="64" cy="64" r="62" fill="url(#skyGradient)" />
+  
+  <!-- Outer ambient glow rings -->
+  <circle cx="64" cy="64" r="54" fill="#BAE6FD" opacity="0.25" />
+  <circle cx="64" cy="64" r="46" fill="#FEF3C7" opacity="0.35" />
+  
+  <!-- 3D Volumetric Ethereal Orb -->
+  <circle cx="64" cy="64" r="38" fill="url(#orbGradient)" filter="url(#orbShadow)" />
+  
+  <!-- Delicate Sanctuary Cross & Rising Wings Emblem -->
+  <!-- Cross Vertical Spine -->
+  <line x1="64" y1="42" x2="64" y2="86" stroke="#0284C7" stroke-width="5" stroke-linecap="round" />
+  <line x1="64" y1="44" x2="64" y2="84" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+  
+  <!-- Cross Horizontal Beam -->
+  <line x1="48" y1="58" x2="80" y2="58" stroke="#0284C7" stroke-width="5" stroke-linecap="round" />
+  <line x1="50" y1="58" x2="78" y2="58" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+  
+  <!-- Rising Wings Arcs -->
+  <path d="M46 54 C48 44, 58 46, 64 56" stroke="#0284C7" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.85" />
+  <path d="M82 54 C80 44, 70 46, 64 56" stroke="#0284C7" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.85" />
+  
+  <!-- Radiant Center Light Diamond -->
+  <polygon points="64,52 69,58 64,64 59,58" fill="#FFFFFF" />
+
+  <defs>
+    <linearGradient id="skyGradient" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0EA5E9" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+    <radialGradient id="orbGradient" cx="56" cy="54" r="38" fx="56" fy="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="70%" stop-color="#BAE6FD" />
+      <stop offset="100%" stop-color="#7DD3FC" />
+    </radialGradient>
+    <filter id="orbShadow" x="16" y="16" width="96" height="96" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0284C7" flood-opacity="0.35" />
+    </filter>
+  </defs>
+</svg>
