@@ -2,6 +2,7 @@ import type { MoodId, AiRecommendation } from '../types';
 import { generateCompassionateGuidance, isCrisisCheck } from './aiGuide';
 import { networkService } from './networkService';
 import { supabaseAuthService } from './auth/supabaseAuthService';
+import { APP_CONFIG } from '../config';
 
 export interface ChatHistoryItem {
   role: 'user' | 'model';
@@ -167,14 +168,27 @@ export function revokeCloudAiConsent(): void {
 }
 
 /**
+ * Returns active Gemini API key for preview mode or empty string during tests.
+ * Loaded securely via environment variable (baked by Vite during mobile build).
+ */
+export function getLiveGeminiApiKey(): string {
+  if (APP_CONFIG.isTest) return '';
+  return import.meta.env.VITE_GEMINI_API_KEY || '';
+}
+
+/**
  * Check if Cloud AI is currently eligible to be called
  */
 export function isCloudAiAvailable(): boolean {
+  const isEligible =
+    supabaseAuthService.getAccountState() === 'AUTHENTICATED' ||
+    (APP_CONFIG.flags.enableCloudAi && Boolean(getLiveGeminiApiKey()));
+
   return (
     getCompanionMode() === 'cloud' &&
     hasCloudAiConsent() &&
     networkService.isConnected() &&
-    supabaseAuthService.getAccountState() === 'AUTHENTICATED'
+    isEligible
   );
 }
 
@@ -496,6 +510,87 @@ async function callCompanionGateway(
 }
 
 /**
+ * Direct Google Gemini API invocation for standalone client preview / guest mode.
+ * Connects directly to Google Generative Language API with the compassionate system prompt.
+ */
+async function callDirectGeminiApi(
+  history: ChatHistoryItem[],
+  currentText: string,
+  _moods: MoodId[],
+  turnCount: number
+): Promise<{ text: string; isAiGenerated: boolean; isCrisis: boolean; shouldShowResources: boolean }> {
+  const apiKey = getLiveGeminiApiKey();
+  if (!apiKey) {
+    throw new Error('Gemini API key is not configured');
+  }
+
+  const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-3.5-flash-lite';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+
+  const formattedContents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
+
+  for (const item of history.slice(-6)) {
+    formattedContents.push({
+      role: item.role === 'model' ? 'model' : 'user',
+      parts: [{ text: item.text }],
+    });
+  }
+
+  formattedContents.push({
+    role: 'user',
+    parts: [{ text: currentText }],
+  });
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-goog-api-key': apiKey,
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: COMPASSIONATE_SYSTEM_PROMPT }],
+        },
+        contents: formattedContents,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 250,
+        },
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Gemini API error (${res.status}): ${errText}`);
+    }
+
+    const data = await res.json();
+    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+    if (!candidateText) {
+      throw new Error('Empty response received from Gemini');
+    }
+
+    return {
+      text: candidateText,
+      isAiGenerated: true,
+      isCrisis: false,
+      shouldShowResources: turnCount >= 2,
+    };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
+
+/**
  * Send a companion message with multi-turn conversation memory.
  * Preserves zero-latency, trauma-informed offline companion as default.
  * Authenticated users with explicit consent can optionally use the server-side Cloud AI Gateway.
@@ -541,7 +636,25 @@ export async function sendCompanionMessage(
 
   if (canUseCloudAi) {
     try {
-      const cloudRes = await callCompanionGateway(history, currentText, moods, turnCount);
+      let cloudRes: { text: string; isAiGenerated: boolean; isCrisis: boolean; shouldShowResources: boolean };
+
+      // In authenticated sessions, try server gateway first;
+      // In standalone client preview / guest mode, connect directly to Google Gemini API
+      if (supabaseAuthService.getAccountState() === 'AUTHENTICATED') {
+        try {
+          cloudRes = await callCompanionGateway(history, currentText, moods, turnCount);
+        } catch (gwErr) {
+          if (getLiveGeminiApiKey()) {
+            cloudRes = await callDirectGeminiApi(history, currentText, moods, turnCount);
+          } else {
+            throw gwErr;
+          }
+        }
+      } else if (getLiveGeminiApiKey()) {
+        cloudRes = await callDirectGeminiApi(history, currentText, moods, turnCount);
+      } else {
+        cloudRes = await callCompanionGateway(history, currentText, moods, turnCount);
+      }
 
       if (cloudRes.isCrisis) {
         const rec = generateCompassionateGuidance(moods.length > 0 ? moods : 'overwhelmed', currentText);

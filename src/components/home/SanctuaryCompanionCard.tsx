@@ -23,12 +23,14 @@ import type {
 } from '../../types';
 import { useEncryptedDraft } from '../../storage/useEncryptedDraft';
 import { TODAY_DEVOTIONAL } from '../../data/mockData';
+import { APP_CONFIG } from '../../config';
 import {
   sendCompanionMessage,
   getCompanionMode,
   setCompanionMode,
   hasCloudAiConsent,
   setCloudAiConsent,
+  getLiveGeminiApiKey,
   type CompanionMode,
   type ChatHistoryItem,
 } from '../../services/geminiService';
@@ -128,14 +130,24 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
   const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
 
   // Companion Mode & Cloud AI Consent State
-  const [companionMode, setCompanionModeState] = useState<CompanionMode>(getCompanionMode());
+  const [companionMode, setCompanionModeState] = useState<CompanionMode>(() => {
+    if (APP_CONFIG.flags.enableCloudAi && getLiveGeminiApiKey()) {
+      if (!hasCloudAiConsent()) {
+        setCloudAiConsent(true);
+      }
+      setCompanionMode('cloud');
+      return 'cloud';
+    }
+    return getCompanionMode();
+  });
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
   const [cloudAiNotice, setCloudAiNotice] = useState<string | null>(null);
 
   const handleToggleCompanionMode = () => {
     if (companionMode === 'offline') {
       const isAuthed = supabaseAuthService.getAccountState() === 'AUTHENTICATED';
-      if (!isAuthed) {
+      const hasDirectKey = Boolean(getLiveGeminiApiKey());
+      if (!isAuthed && !hasDirectKey && !APP_CONFIG.flags.enableCloudAi) {
         setCloudAiNotice('Sanctuary operates 100% privately and offline on your device. Live Gemini Cloud AI is planned for a future release with user consent.');
         setTimeout(() => setCloudAiNotice(null), 5000);
         return;

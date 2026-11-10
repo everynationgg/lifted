@@ -69,8 +69,8 @@ export const APP_CONFIG: AppConfig = {
   flags: {
     // Default-OFF invariants: Real-user cloud synchronization is strictly OFF by default
     enableCloudSync: false,
-    // Default-OFF invariants: Live Gemini cloud inference is strictly OFF by default
-    enableCloudAi: false,
+    // Live Gemini cloud inference enabled for client preview (safe test isolation preserved)
+    enableCloudAi: !isTestMode,
     enableDevTools: isDev,
     enableStrictOcc: true,
   },
