@@ -88,6 +88,14 @@ describe('geminiService - Sanctuary Companion & Phase 7 Cloud AI Gateway', () =>
       expect(response.text.toLowerCase()).toContain('hello');
     });
 
+    it('Turn 1 with Positive/Lucky Sentiment: Celebrates warmly without mentioning heaviness', async () => {
+      const response = await sendCompanionMessage([], "I'm feeling lucky", ['unsure'], 1);
+      expect(response.isCrisis).toBe(false);
+      expect(response.shouldShowResources).toBe(false);
+      expect(response.text.toLowerCase()).not.toContain('heavy');
+      expect(response.text.toLowerCase()).toContain('joy');
+    });
+
     it('Turn 1 with Explicit Tool Request: Reveals resources when requested', async () => {
       const response = await sendCompanionMessage([], 'Can you give me a scripture to pray through?', ['anxious'], 1);
       expect(response.isCrisis).toBe(false);

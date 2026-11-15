@@ -41,19 +41,22 @@ try {
 }
 
 // System prompt specification for Cloud AI Gateway
-export const COMPASSIONATE_SYSTEM_PROMPT = `You are the LIFTED Compassionate Guide, a faith-based, trauma-informed emotional companion for adults and parents navigating healing from past trauma, emotional wounds, and mental health challenges.
+export const COMPASSIONATE_SYSTEM_PROMPT = `You are the LIFTED Compassionate Guide, a warm, faith-based, trauma-informed emotional wellness companion.
 
 Core Principles:
-1. TONE: Warm, deeply empathetic, gentle, Christ-centered grace, and non-judgmental. Speak like a tender pastoral counselor or trusted Christian mentor holding sacred space.
-2. CONCISENESS: Keep your reply to 2 to 3 sentences maximum (under 75 words). Never preach, never lecture, and never write overwhelming blocks of text.
-3. CONVERSATIONAL PACING (CRITICAL):
-   - In early turns (Turn 1 & Turn 2), your ONLY job is to LISTEN, VALIDATE, and HOLD SPACE. Do not offer unsolicited solutions, advice, or homework yet.
-   - Always address what the user actually said (e.g. if they say "hello", greet them back warmly; if they share a struggle, acknowledge that specific struggle).
-   - Ask ONE gentle, open-ended question that helps them unpack what their heart is carrying.
-4. BOUNDARIES & SAFETY:
+1. MATCH THE USER'S EMOTIONAL ENERGY (CRITICAL):
+   - Always mirror the user's actual mood and tone!
+   - If the user is feeling positive, happy, lucky, grateful, excited, playful, or casual, celebrate and rejoice with them purely and warmly! NEVER mention "heaviness", "burdens", "trauma", "pain", "healing", or "hard roads" when the user is feeling good or sharing something positive.
+   - Only use comforting or struggle-focused language when the user actually expresses sadness, stress, anxiety, or difficulty.
+2. TONE: Warm, empathetic, gentle, Christ-centered grace, and non-judgmental—like a caring Christian friend or trusted mentor.
+3. CONCISENESS: Keep your reply to 2 to 3 sentences maximum (under 75 words). Never preach, never lecture, and never write overwhelming blocks of text.
+4. CONVERSATIONAL PACING (CRITICAL):
+   - In early turns (Turn 1 & Turn 2), listen, validate, and connect directly with what the user actually said. Do not offer unsolicited homework or advice yet.
+   - Ask ONE natural, open-ended question that fits their mood (celebrating what's going well if they feel good, or gently exploring what's on their mind if they are struggling).
+5. BOUNDARIES & SAFETY:
    - Provide spiritual comfort, peer empathy, and mindful presence. Do NOT provide medical diagnosis or clinical treatment.
    - If the user expresses self-harm or suicidal thoughts, respond with urgent tenderness and urge them to call or text 988 or text HOME to 741741 immediately.
-5. SCRIPTURAL ROOTS: You may naturally weave in the tender assurance of God's love, but keep it organic and gentle—never weaponize scripture or use toxic positivity. Never invent citations.`;
+6. SCRIPTURAL ROOTS: Weave in natural encouragement, gratitude, or the tender assurance of God's love when fitting—never weaponize scripture, use toxic positivity, or invent citations.`;
 
 /**
  * Client-side key accessors deprecated per Phase 0/7 security standards.
@@ -253,6 +256,24 @@ export function getSmartDialogueResponse(
     lower.includes('wonderful') ||
     lower.includes('better') ||
     lower.includes('glad') ||
+    lower.includes('lucky') ||
+    lower.includes('fortunate') ||
+    lower.includes('excited') ||
+    lower.includes('amazing') ||
+    lower.includes('awesome') ||
+    lower.includes('fantastic') ||
+    lower.includes('joy') ||
+    lower.includes('thankful') ||
+    lower.includes('grateful') ||
+    lower.includes('thriving') ||
+    lower.includes('praise') ||
+    lower.includes('yay') ||
+    lower.includes('optimistic') ||
+    lower.includes('hopeful') ||
+    lower.includes('relaxed') ||
+    lower.includes('chill') ||
+    lower.includes('super') ||
+    lower.includes('lovely') ||
     primaryMood === 'peaceful' ||
     primaryMood === 'happy' ||
     primaryMood === 'grateful' ||
@@ -314,12 +335,12 @@ export function getSmartDialogueResponse(
   if (isPositive) {
     if (turnCount <= 1) {
       return {
-        text: "What a gift to rest in peace and gratitude today. Noticing these quiet, joyful spaces restores our souls. What has felt most life-giving for you today?",
+        text: "I love hearing that! What a wonderful gift to experience that bright, positive energy today. What is bringing your heart the most joy or gratitude right now?",
         shouldShowResources: false,
       };
     }
     return {
-      text: "That brings so much warmth to my heart! Holding onto joy and gratitude is a powerful anchor for healing. Whenever you feel ready, here are a few gentle suggestions to continue nurturing your spirit:",
+      text: "That brings so much warmth to my heart! Celebrating these joyful moments is such a blessing. Whenever you feel ready, here are a few gentle ways to continue nurturing your spirit:",
       shouldShowResources: true,
     };
   }
@@ -415,9 +436,18 @@ export function getSmartDialogueResponse(
       };
     }
 
-    // General conversational listening
+    // General conversational listening (only mention heaviness if a heavy mood chip was explicitly selected)
+    const isHeavyMood = primaryMood === 'tired' || primaryMood === 'frustrated';
+
+    if (isHeavyMood) {
+      return {
+        text: "Thank you for sharing that so openly with me. Giving words to what's inside takes real courage, and you don't have to carry it alone. What feels most urgent or heavy for you right now?",
+        shouldShowResources: false,
+      };
+    }
+
     return {
-      text: "Thank you for sharing that so openly with me. Giving words to what's inside takes real courage, and you don't have to carry it alone. What feels most urgent or heavy for you right now?",
+      text: "Thank you for sharing that with me! I'm right here with you and would love to hear more. What's most on your mind or heart today?",
       shouldShowResources: false,
     };
   }
@@ -516,7 +546,7 @@ async function callCompanionGateway(
 async function callDirectGeminiApi(
   history: ChatHistoryItem[],
   currentText: string,
-  _moods: MoodId[],
+  moods: MoodId[],
   turnCount: number
 ): Promise<{ text: string; isAiGenerated: boolean; isCrisis: boolean; shouldShowResources: boolean }> {
   const apiKey = getLiveGeminiApiKey();
@@ -536,9 +566,15 @@ async function callDirectGeminiApi(
     });
   }
 
+  const explicitMoods = moods.filter((m) => m && m !== 'unsure');
+  const promptText =
+    explicitMoods.length > 0 && !currentText.toLowerCase().includes('checking in feeling')
+      ? `[User selected mood: ${explicitMoods.join(', ')}] ${currentText}`
+      : currentText;
+
   formattedContents.push({
     role: 'user',
-    parts: [{ text: currentText }],
+    parts: [{ text: promptText }],
   });
 
   const controller = new AbortController();
@@ -558,7 +594,7 @@ async function callDirectGeminiApi(
         contents: formattedContents,
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 250,
+          maxOutputTokens: 500,
         },
       }),
       signal: controller.signal,
@@ -572,7 +608,12 @@ async function callDirectGeminiApi(
     }
 
     const data = await res.json();
-    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const parts: Array<{ text?: string; thought?: boolean }> =
+      data.candidates?.[0]?.content?.parts || [];
+    const textPart =
+      parts.find((p) => !p.thought && typeof p.text === 'string' && p.text.trim().length > 0) ||
+      parts[0];
+    const candidateText = textPart?.text?.trim();
 
     if (!candidateText) {
       throw new Error('Empty response received from Gemini');
