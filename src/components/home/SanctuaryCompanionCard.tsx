@@ -499,7 +499,7 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
                     <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{msg.timestamp}</span>
                   </div>
 
-                  <p className="chat-ai-text">"{msg.text}"</p>
+                  <p className="chat-ai-text">{msg.text}</p>
 
                   {/* Immediate Crisis Support Card if crisis keywords triggered */}
                   {msg.isCrisis && (
@@ -713,171 +713,171 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
       )}
 
       {/* Chat Input Card + Feeling Chips */}
-      {conversationTurn < 2 ? (
-        <div className="home-chat-card">
-          {selectedTags.length > 0 && (
-            <div className="chat-selected-ribbon">
-              {selectedTags.map((tagId) => {
-                const label = FEELING_PILLS.find((p) => p.id === tagId)?.label || tagId;
-                return (
-                  <div key={tagId} className="chat-selected-feeling-chip">
-                    <span>{label}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleTagToggle(tagId)}
-                      className="chat-selected-tag-remove"
-                      title={`Remove ${label}`}
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+      <div className="home-chat-card">
+        {selectedTags.length > 0 && (
+          <div className="chat-selected-ribbon">
+            {selectedTags.map((tagId) => {
+              const label = FEELING_PILLS.find((p) => p.id === tagId)?.label || tagId;
+              return (
+                <div key={tagId} className="chat-selected-feeling-chip">
+                  <span>{label}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleTagToggle(tagId)}
+                    className="chat-selected-tag-remove"
+                    title={`Remove ${label}`}
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-          {voiceNotice && (
+        {voiceNotice && (
+          <div
+            style={{
+              background: '#FEF2F2',
+              border: '1px solid #FECACA',
+              color: '#991B1B',
+              borderRadius: 'var(--radius-sm)',
+              padding: '6px 10px',
+              fontSize: '0.74rem',
+              marginBottom: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <AlertCircle size={13} color="#DC2626" style={{ flexShrink: 0 }} />
+            <span>{voiceNotice}</span>
+          </div>
+        )}
+
+        {isListening && (
+          <div
+            onClick={toggleListening}
+            role="button"
+            tabIndex={0}
+            style={{
+              background: '#EFF6FF',
+              border: '1px solid #BFDBFE',
+              color: 'var(--blue-accent-dark)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '7px 12px',
+              fontSize: '0.74rem',
+              marginBottom: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+            title="Click anywhere on this bar to stop listening"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+              <span className="voice-listening-dot" />
+              <span>Listening... Speak your reflection</span>
+            </div>
+            <span style={{ fontSize: '0.70rem', color: '#DC2626', fontWeight: 700 }}>Tap to stop</span>
+          </div>
+        )}
+
+        <form onSubmit={handleChatSubmit} style={{ margin: 0 }}>
+          {checkInDraft.hasDraft && (
             <div
               style={{
-                background: '#FEF2F2',
-                border: '1px solid #FECACA',
-                color: '#991B1B',
-                borderRadius: 'var(--radius-sm)',
-                padding: '6px 10px',
-                fontSize: '0.74rem',
-                marginBottom: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              <AlertCircle size={13} color="#DC2626" style={{ flexShrink: 0 }} />
-              <span>{voiceNotice}</span>
-            </div>
-          )}
-
-          {isListening && (
-            <div
-              onClick={toggleListening}
-              role="button"
-              tabIndex={0}
-              style={{
-                background: '#EFF6FF',
-                border: '1px solid #BFDBFE',
-                color: 'var(--blue-accent-dark)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '7px 12px',
-                fontSize: '0.74rem',
-                marginBottom: '8px',
+                background: 'var(--blue-light-sky, #e0f2fe)',
+                border: '1px solid var(--border-subtle, #bae6fd)',
+                borderRadius: 'var(--radius-sm, 8px)',
+                padding: '6px 12px',
+                fontSize: '0.78rem',
+                color: 'var(--blue-accent-dark, #0284c7)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                cursor: 'pointer',
-                userSelect: 'none',
+                gap: '8px',
+                marginBottom: '8px',
               }}
-              title="Click anywhere on this bar to stop listening"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
-                <span className="voice-listening-dot" />
-                <span>Listening... Speak your reflection</span>
+              <span>Restored unfinished check-in draft.</span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={checkInDraft.restoreDraft}
+                  style={{
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    color: 'var(--blue-accent-dark, #0284c7)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Use Draft
+                </button>
+                <button
+                  type="button"
+                  onClick={() => checkInDraft.discardDraft()}
+                  style={{
+                    fontSize: '0.76rem',
+                    color: 'var(--text-muted, #94a3b8)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Discard
+                </button>
               </div>
-              <span style={{ fontSize: '0.70rem', color: '#DC2626', fontWeight: 700 }}>Tap to stop</span>
             </div>
           )}
+          <div className="home-chat-input-row">
+            <input
+              ref={inputRef}
+              id="home-mood-text"
+              type="text"
+              value={customText}
+              onChange={(e) => {
+                if (isListening) {
+                  setIsListening(false);
+                  voiceService.stopListening();
+                }
+                setCustomText(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleChatSubmit(e);
+                }
+              }}
+              enterKeyHint="send"
+              placeholder={isListening ? 'Listening... Speak from your heart' : getPlaceholderText()}
+              className="home-chat-input"
+            />
+            <button
+              type="button"
+              onClick={toggleListening}
+              className={`btn-chat-mic ${isListening ? 'active' : ''}`}
+              title={isListening ? 'Stop listening' : 'Speak your check-in'}
+            >
+              {isListening ? <MicOff size={15} color="#DC2626" /> : <Mic size={15} />}
+            </button>
+            <button
+              id="btn-submit-mood-text"
+              type="submit"
+              disabled={!customText.trim() && selectedTags.length === 0}
+              className={`btn-chat-send ${customText.trim() || selectedTags.length > 0 ? 'ready' : 'disabled'}`}
+              title="Send message"
+            >
+              <Send size={15} />
+            </button>
+          </div>
+        </form>
 
-          <form onSubmit={handleChatSubmit} style={{ margin: 0 }}>
-            {checkInDraft.hasDraft && (
-              <div
-                style={{
-                  background: 'var(--blue-light-sky, #e0f2fe)',
-                  border: '1px solid var(--border-subtle, #bae6fd)',
-                  borderRadius: 'var(--radius-sm, 8px)',
-                  padding: '6px 12px',
-                  fontSize: '0.78rem',
-                  color: 'var(--blue-accent-dark, #0284c7)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '8px',
-                  marginBottom: '8px',
-                }}
-              >
-                <span>Restored unfinished check-in draft.</span>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    type="button"
-                    onClick={checkInDraft.restoreDraft}
-                    style={{
-                      fontSize: '0.76rem',
-                      fontWeight: 700,
-                      color: 'var(--blue-accent-dark, #0284c7)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Use Draft
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => checkInDraft.discardDraft()}
-                    style={{
-                      fontSize: '0.76rem',
-                      color: 'var(--text-muted, #94a3b8)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Discard
-                  </button>
-                </div>
-              </div>
-            )}
-            <div className="home-chat-input-row">
-              <input
-                ref={inputRef}
-                id="home-mood-text"
-                type="text"
-                value={customText}
-                onChange={(e) => {
-                  if (isListening) {
-                    setIsListening(false);
-                    voiceService.stopListening();
-                  }
-                  setCustomText(e.target.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleChatSubmit(e);
-                  }
-                }}
-                enterKeyHint="send"
-                placeholder={isListening ? 'Listening... Speak from your heart' : getPlaceholderText()}
-                className="home-chat-input"
-              />
-              <button
-                type="button"
-                onClick={toggleListening}
-                className={`btn-chat-mic ${isListening ? 'active' : ''}`}
-                title={isListening ? 'Stop listening' : 'Speak your check-in'}
-              >
-                {isListening ? <MicOff size={15} color="#DC2626" /> : <Mic size={15} />}
-              </button>
-              <button
-                id="btn-submit-mood-text"
-                type="submit"
-                disabled={!customText.trim() && selectedTags.length === 0}
-                className={`btn-chat-send ${customText.trim() || selectedTags.length > 0 ? 'ready' : 'disabled'}`}
-                title="Send message"
-              >
-                <Send size={15} />
-              </button>
-            </div>
-          </form>
-
-          {/* Emotion Pills */}
+        {/* Emotion Pills (shown before conversation starts) */}
+        {!isConversationActive && (
           <div className="feeling-pills-section">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span className="feeling-pills-label">How are you feeling?</span>
@@ -944,28 +944,8 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
               </div>
             )}
           </div>
-        </div>
-      ) : (
-        <div className="home-chat-completed-card">
-          <div>
-            <div style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Sanctuary check-in complete
-            </div>
-            <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-              Holding space for your day. You can explore all paths below.
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handleResetCheckIn}
-            className="btn-sanctuary-reset"
-            title="Start a new check-in"
-          >
-            <RotateCcw size={12} />
-            <span>Start New Check-in</span>
-          </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Cloud AI Informed Consent Modal */}
       <CloudAiConsentModal

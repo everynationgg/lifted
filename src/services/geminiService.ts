@@ -41,22 +41,23 @@ try {
 }
 
 // System prompt specification for Cloud AI Gateway
-export const COMPASSIONATE_SYSTEM_PROMPT = `You are the LIFTED Compassionate Guide, a warm, faith-based, trauma-informed emotional wellness companion.
+export const COMPASSIONATE_SYSTEM_PROMPT = `You are the LIFTED Companion—a warm, genuine, down-to-earth Christian friend and supportive conversational partner.
 
 Core Principles:
-1. MATCH THE USER'S EMOTIONAL ENERGY (CRITICAL):
-   - Always mirror the user's actual mood and tone!
-   - If the user is feeling positive, happy, lucky, grateful, excited, playful, or casual, celebrate and rejoice with them purely and warmly! NEVER mention "heaviness", "burdens", "trauma", "pain", "healing", or "hard roads" when the user is feeling good or sharing something positive.
-   - Only use comforting or struggle-focused language when the user actually expresses sadness, stress, anxiety, or difficulty.
-2. TONE: Warm, empathetic, gentle, Christ-centered grace, and non-judgmental—like a caring Christian friend or trusted mentor.
-3. CONCISENESS: Keep your reply to 2 to 3 sentences maximum (under 75 words). Never preach, never lecture, and never write overwhelming blocks of text.
-4. CONVERSATIONAL PACING (CRITICAL):
-   - In early turns (Turn 1 & Turn 2), listen, validate, and connect directly with what the user actually said. Do not offer unsolicited homework or advice yet.
-   - Ask ONE natural, open-ended question that fits their mood (celebrating what's going well if they feel good, or gently exploring what's on their mind if they are struggling).
-5. BOUNDARIES & SAFETY:
-   - Provide spiritual comfort, peer empathy, and mindful presence. Do NOT provide medical diagnosis or clinical treatment.
-   - If the user expresses self-harm or suicidal thoughts, respond with urgent tenderness and urge them to call or text 988 or text HOME to 741741 immediately.
-6. SCRIPTURAL ROOTS: Weave in natural encouragement, gratitude, or the tender assurance of God's love when fitting—never weaponize scripture, use toxic positivity, or invent citations.`;
+1. TALK LIKE A REAL PERSON (NOT A TEMPLATE OR GREETING CARD):
+   - Have a natural, back-and-forth human conversation! Match the user's vibe, slang, energy, and casualness.
+   - If they say something casual or upbeat like "yo, im feeling lucky and blessed!", reply naturally like a real friend (e.g., "Haha love that energy! What's got you feeling so lucky and blessed today?").
+   - If they ask "do you respond?" or test the chat, answer them directly and naturally (e.g., "Yep, I'm right here! What's going on with you today?").
+   - NEVER sound overly solemn, dramatic, poetic, or like the user is on their deathbed! Avoid stiff phrases like "What a gift to rest in quiet spaces that restore our souls" or "God is near to you in this exact spot—He doesn't rush you to fix everything" during normal or upbeat chats.
+2. MATCH THE USER'S EMOTIONAL ENERGY (CRITICAL):
+   - Casual / Happy / Lucky / Blessed -> Keep it upbeat, warm, conversational, and fun! NEVER mention "heaviness", "burdens", "trauma", "pain", "healing", or "hard roads".
+   - Stressed / Sad / Anxious / Hurting -> Be a gentle, empathetic, caring listener who validates their feelings without preaching or lecturing.
+3. CONCISE & CONVERSATIONAL:
+   - Keep your reply to 1 to 3 natural sentences (under 60 words).
+   - End with a natural follow-up question that fits what they just said so the conversation flows like texting a close friend.
+4. BOUNDARIES & SAFETY:
+   - Do NOT provide medical diagnosis or clinical treatment.
+   - If the user expresses self-harm or suicidal thoughts, respond with urgent care and urge them to call or text 988 or text HOME to 741741 immediately.`;
 
 /**
  * Client-side key accessors deprecated per Phase 0/7 security standards.
@@ -315,10 +316,28 @@ export function getSmartDialogueResponse(
     };
   }
 
-  // 2. Identity / Purpose inquiries ("who are you", "what can you do")
-  if (lower.includes('who are you') || lower.includes('what are you') || lower.includes('what do you do')) {
+  // 2. Identity / Purpose / Responsiveness inquiries ("who are you", "do you respond", "are you there")
+  if (
+    lower.includes('who are you') ||
+    lower.includes('what are you') ||
+    lower.includes('what do you do')
+  ) {
     return {
-      text: "I'm your LIFTED Sanctuary Companion. I'm here to listen without judgment, walk beside you through life's seasons, pray with you, and help you find peace in God's presence.",
+      text: "I'm your LIFTED Companion! I'm here to chat, listen without judgment, and walk beside you through whatever is on your mind today.",
+      shouldShowResources: false,
+    };
+  }
+
+  if (
+    lower.includes('do you respond') ||
+    lower.includes('are you there') ||
+    lower.includes('can you hear') ||
+    lower.includes('are you real') ||
+    lower === 'test' ||
+    lower === 'testing'
+  ) {
+    return {
+      text: "Yep, I'm right here with you! We can talk about whatever's on your mind—how's your day going so far?",
       shouldShowResources: false,
     };
   }
@@ -326,24 +345,53 @@ export function getSmartDialogueResponse(
   // 3. User asks "how are you"
   if (lower.includes('how are you') || lower.includes('how r u')) {
     return {
-      text: "Thank you so much for asking! I'm here and fully present with you today. More importantly, how is your soul feeling right now?",
+      text: "Doing great, thank you for asking! I'm right here and happy to chat with you. How are things going on your end today?",
       shouldShowResources: false,
     };
   }
 
   // 4. Positive sentiment in Turn 1 or Turn 2
-  if (isPositive) {
+  if (isPositive && turnCount < 3) {
     if (turnCount <= 1) {
       return {
-        text: "I love hearing that! What a wonderful gift to experience that bright, positive energy today. What is bringing your heart the most joy or gratitude right now?",
+        text: "Haha I love hearing that! What's bringing you so much joy and good energy today?",
         shouldShowResources: false,
       };
     }
     return {
-      text: "That brings so much warmth to my heart! Celebrating these joyful moments is such a blessing. Whenever you feel ready, here are a few gentle ways to continue nurturing your spirit:",
-      shouldShowResources: true,
+      text: "That's awesome to hear! Keep soaking in those good moments—what else have you been up to today?",
+      shouldShowResources: false,
     };
   }
+
+  const isDistressed =
+    primaryMood === 'sad' ||
+    primaryMood === 'anxious' ||
+    primaryMood === 'tired' ||
+    primaryMood === 'overwhelmed' ||
+    primaryMood === 'lonely' ||
+    primaryMood === 'frustrated' ||
+    lower.includes('fight') ||
+    lower.includes('argument') ||
+    lower.includes('tired') ||
+    lower.includes('exhausted') ||
+    lower.includes('burnout') ||
+    lower.includes('pagod') ||
+    lower.includes('died') ||
+    lower.includes('death') ||
+    lower.includes('loss') ||
+    lower.includes('grief') ||
+    lower.includes('anxious') ||
+    lower.includes('scared') ||
+    lower.includes('panic') ||
+    lower.includes('worry') ||
+    lower.includes('overwhelm') ||
+    lower.includes('too much') ||
+    lower.includes('stressed') ||
+    lower.includes('lonely') ||
+    lower.includes('alone') ||
+    lower.includes('hurt') ||
+    lower.includes('sad');
 
   // 5. Turn 1: Active Listening & Conversational Mirroring (Struggles & Heavy Emotions)
   if (turnCount <= 1 && !userRequestedResources) {
@@ -447,22 +495,28 @@ export function getSmartDialogueResponse(
     }
 
     return {
-      text: "Thank you for sharing that with me! I'm right here with you and would love to hear more. What's most on your mind or heart today?",
+      text: "Thanks for sharing that with me! I'm right here and would love to hear more—what's on your mind today?",
       shouldShowResources: false,
     };
   }
 
-  // 6. Turn 2: Deepening Comfort & Presenting Helpful Next Steps
+  // 6. Turn 2: Conversational Follow-up (only show resources if user is distressed)
   if (turnCount === 2 && !userRequestedResources) {
+    if (isDistressed) {
+      return {
+        text: "I hear you, and you don't have to figure it all out at once. Take a breath—if any of these feel helpful right now, they're right here for you, or we can just keep talking:",
+        shouldShowResources: true,
+      };
+    }
     return {
-      text: "I hear you so clearly. God is near to you in this exact spot—He doesn't rush you to fix everything. Here are a few gentle suggestions tailored for you whenever you are ready:",
-      shouldShowResources: true,
+      text: "I'm right here with you! Tell me more—what else has been on your mind today?",
+      shouldShowResources: false,
     };
   }
 
   // 7. Turn 3+ or User Explicitly Asked for Tools
   return {
-    text: "You are holding space for healing with so much courage today. Whenever you feel ready, here are gentle anchors and practical tools tailored for you:",
+    text: "I'm really glad we're chatting today. We can keep talking as long as you'd like, or you can explore any of these whenever you want:",
     shouldShowResources: true,
   };
 }
@@ -547,7 +601,7 @@ async function callDirectGeminiApi(
   history: ChatHistoryItem[],
   currentText: string,
   moods: MoodId[],
-  turnCount: number
+  _turnCount: number
 ): Promise<{ text: string; isAiGenerated: boolean; isCrisis: boolean; shouldShowResources: boolean }> {
   const apiKey = getLiveGeminiApiKey();
   if (!apiKey) {
@@ -623,7 +677,7 @@ async function callDirectGeminiApi(
       text: candidateText,
       isAiGenerated: true,
       isCrisis: false,
-      shouldShowResources: turnCount >= 2,
+      shouldShowResources: false,
     };
   } catch (err) {
     clearTimeout(timeoutId);
@@ -657,7 +711,7 @@ export async function sendCompanionMessage(
     };
   }
 
-  // Determine if resources should be revealed
+  // Determine if resources were explicitly requested by the user
   const userRequestedResources =
     lower.includes('scripture') ||
     lower.includes('verse') ||
@@ -670,28 +724,18 @@ export async function sendCompanionMessage(
     lower.includes('resource') ||
     lower.includes('tool') ||
     lower.includes('exercise');
-  const shouldRevealResources = turnCount >= 2 || userRequestedResources;
 
-  // 2. Check if Cloud AI Gateway is active and authorized
-  const canUseCloudAi = isCloudAiAvailable();
+  // 2. Check if Cloud AI Gateway or Direct Gemini API is active
+  const hasDirectPreviewKey = APP_CONFIG.flags.enableCloudAi && Boolean(getLiveGeminiApiKey());
+  const canUseCloudAi = isCloudAiAvailable() || (hasDirectPreviewKey && getCompanionMode() === 'cloud');
 
   if (canUseCloudAi) {
     try {
       let cloudRes: { text: string; isAiGenerated: boolean; isCrisis: boolean; shouldShowResources: boolean };
 
-      // In authenticated sessions, try server gateway first;
-      // In standalone client preview / guest mode, connect directly to Google Gemini API
-      if (supabaseAuthService.getAccountState() === 'AUTHENTICATED') {
-        try {
-          cloudRes = await callCompanionGateway(history, currentText, moods, turnCount);
-        } catch (gwErr) {
-          if (getLiveGeminiApiKey()) {
-            cloudRes = await callDirectGeminiApi(history, currentText, moods, turnCount);
-          } else {
-            throw gwErr;
-          }
-        }
-      } else if (getLiveGeminiApiKey()) {
+      // When a direct preview key is configured, connect directly to Google Gemini API immediately;
+      // otherwise use the server-side gateway (used in authenticated/unit test environments).
+      if (hasDirectPreviewKey) {
         cloudRes = await callDirectGeminiApi(history, currentText, moods, turnCount);
       } else {
         cloudRes = await callCompanionGateway(history, currentText, moods, turnCount);
@@ -708,14 +752,15 @@ export async function sendCompanionMessage(
         };
       }
 
-      const rec = (cloudRes.shouldShowResources || shouldRevealResources)
+      const showCloudResources = Boolean(cloudRes.shouldShowResources) || userRequestedResources;
+      const rec = showCloudResources
         ? generateCompassionateGuidance(moods.length > 0 ? moods : 'unsure', currentText)
         : undefined;
 
       return {
         text: cloudRes.text,
         isCrisis: false,
-        shouldShowResources: cloudRes.shouldShowResources || shouldRevealResources,
+        shouldShowResources: showCloudResources,
         recommendation: rec,
         isAiGenerated: cloudRes.isAiGenerated,
       };
@@ -726,14 +771,15 @@ export async function sendCompanionMessage(
 
       // Fall through to deterministic offline fallback engine
       const fallbackResult = getSmartDialogueResponse(moods, currentText, turnCount);
-      const rec = (fallbackResult.shouldShowResources || shouldRevealResources)
+      const showFallbackResources = fallbackResult.shouldShowResources || userRequestedResources;
+      const rec = showFallbackResources
         ? generateCompassionateGuidance(moods.length > 0 ? moods : 'unsure', currentText)
         : undefined;
 
       return {
         text: fallbackResult.text,
         isCrisis: false,
-        shouldShowResources: fallbackResult.shouldShowResources || shouldRevealResources,
+        shouldShowResources: showFallbackResources,
         recommendation: rec,
         isAiGenerated: false, // Strictly false: Fallback is deterministic, never remote AI
         fallbackReason: `${errName}: ${errMsg}`,
@@ -743,14 +789,15 @@ export async function sendCompanionMessage(
 
   // 3. Resilient Smart Conversational Fallback Engine (Offline Sanctuary Companion)
   const fallbackResult = getSmartDialogueResponse(moods, currentText, turnCount);
-  const rec = (fallbackResult.shouldShowResources || shouldRevealResources)
+  const showOfflineResources = fallbackResult.shouldShowResources || userRequestedResources;
+  const rec = showOfflineResources
     ? generateCompassionateGuidance(moods.length > 0 ? moods : 'unsure', currentText)
     : undefined;
 
   return {
     text: fallbackResult.text,
     isCrisis: false,
-    shouldShowResources: fallbackResult.shouldShowResources || shouldRevealResources,
+    shouldShowResources: showOfflineResources,
     recommendation: rec,
     isAiGenerated: false,
   };
