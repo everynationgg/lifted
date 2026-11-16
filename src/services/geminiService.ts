@@ -601,7 +601,7 @@ async function callDirectGeminiApi(
   history: ChatHistoryItem[],
   currentText: string,
   moods: MoodId[],
-  _turnCount: number
+  turnCount: number
 ): Promise<{ text: string; isAiGenerated: boolean; isCrisis: boolean; shouldShowResources: boolean }> {
   const apiKey = getLiveGeminiApiKey();
   if (!apiKey) {
@@ -677,7 +677,7 @@ async function callDirectGeminiApi(
       text: candidateText,
       isAiGenerated: true,
       isCrisis: false,
-      shouldShowResources: false,
+      shouldShowResources: turnCount >= 2,
     };
   } catch (err) {
     clearTimeout(timeoutId);
@@ -711,7 +711,13 @@ export async function sendCompanionMessage(
     };
   }
 
-  // Determine if resources were explicitly requested by the user
+  // Combine user messages across the chat so recommendations reflect the full conversation
+  const fullUserContext = [
+    ...history.filter((h) => h.role === 'user').map((h) => h.text),
+    currentText,
+  ].join(' ');
+
+  // Determine if resources were explicitly requested or if Turn 2+ reached
   const userRequestedResources =
     lower.includes('scripture') ||
     lower.includes('verse') ||
@@ -724,6 +730,7 @@ export async function sendCompanionMessage(
     lower.includes('resource') ||
     lower.includes('tool') ||
     lower.includes('exercise');
+  const shouldRevealResources = turnCount >= 2 || userRequestedResources;
 
   // 2. Check if Cloud AI Gateway or Direct Gemini API is active
   const hasDirectPreviewKey = APP_CONFIG.flags.enableCloudAi && Boolean(getLiveGeminiApiKey());
@@ -742,7 +749,7 @@ export async function sendCompanionMessage(
       }
 
       if (cloudRes.isCrisis) {
-        const rec = generateCompassionateGuidance(moods.length > 0 ? moods : 'overwhelmed', currentText);
+        const rec = generateCompassionateGuidance(moods.length > 0 ? moods : 'overwhelmed', fullUserContext);
         return {
           text: cloudRes.text,
           isCrisis: true,
@@ -752,9 +759,9 @@ export async function sendCompanionMessage(
         };
       }
 
-      const showCloudResources = Boolean(cloudRes.shouldShowResources) || userRequestedResources;
+      const showCloudResources = Boolean(cloudRes.shouldShowResources) || shouldRevealResources;
       const rec = showCloudResources
-        ? generateCompassionateGuidance(moods.length > 0 ? moods : 'unsure', currentText)
+        ? generateCompassionateGuidance(moods.length > 0 ? moods : 'unsure', fullUserContext)
         : undefined;
 
       return {
@@ -771,9 +778,9 @@ export async function sendCompanionMessage(
 
       // Fall through to deterministic offline fallback engine
       const fallbackResult = getSmartDialogueResponse(moods, currentText, turnCount);
-      const showFallbackResources = fallbackResult.shouldShowResources || userRequestedResources;
+      const showFallbackResources = fallbackResult.shouldShowResources || shouldRevealResources;
       const rec = showFallbackResources
-        ? generateCompassionateGuidance(moods.length > 0 ? moods : 'unsure', currentText)
+        ? generateCompassionateGuidance(moods.length > 0 ? moods : 'unsure', fullUserContext)
         : undefined;
 
       return {
@@ -789,9 +796,9 @@ export async function sendCompanionMessage(
 
   // 3. Resilient Smart Conversational Fallback Engine (Offline Sanctuary Companion)
   const fallbackResult = getSmartDialogueResponse(moods, currentText, turnCount);
-  const showOfflineResources = fallbackResult.shouldShowResources || userRequestedResources;
+  const showOfflineResources = fallbackResult.shouldShowResources || shouldRevealResources;
   const rec = showOfflineResources
-    ? generateCompassionateGuidance(moods.length > 0 ? moods : 'unsure', currentText)
+    ? generateCompassionateGuidance(moods.length > 0 ? moods : 'unsure', fullUserContext)
     : undefined;
 
   return {

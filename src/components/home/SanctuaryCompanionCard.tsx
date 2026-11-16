@@ -21,7 +21,7 @@ import type {
   DiscoverPillarId,
 } from '../../types';
 import { useEncryptedDraft } from '../../storage/useEncryptedDraft';
-import { TODAY_DEVOTIONAL } from '../../data/mockData';
+import { TODAY_DEVOTIONAL, DEVOTIONAL_ARCHIVE } from '../../data/mockData';
 import { APP_CONFIG } from '../../config';
 import {
   sendCompanionMessage,
@@ -491,45 +491,201 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
                     </div>
                   )}
 
-                  {/* Suggestions after talking */}
-                  {msg.shouldShowResources && (
-                    <div className="chat-actions-container">
-                      <span className="chat-actions-label">Gentle Suggestions After Our Chat:</span>
-                      <div className="chat-actions-wrap">
-                        <button
-                          onClick={() => onNavigateDiscoverPillar?.('professional')}
-                          className="chat-action-btn"
-                        >
-                          <Wind size={13} />
-                          <span>4-7-8 Breathing Calm</span>
-                        </button>
+                  {/* Dynamic Suggestions tailored to the conversation */}
+                  {msg.shouldShowResources && (() => {
+                    const pathways = msg.recommendation?.triagePathways;
+                    const theme = pathways?.detectedTheme || 'Anxiety & Nervous System Calm';
+                    const matchedDevotional =
+                      DEVOTIONAL_ARCHIVE.find((d) => d.id === pathways?.biblePathway?.devotionalId) ||
+                      TODAY_DEVOTIONAL;
+                    const scriptureLabel = pathways?.biblePathway?.title || 'Daily Scripture';
 
-                        <button
-                          onClick={() => onOpenDevotional(TODAY_DEVOTIONAL)}
-                          className="chat-action-btn"
-                        >
-                          <BookOpen size={13} />
-                          <span>Daily Scripture</span>
-                        </button>
-
-                        <button
-                          onClick={() => onNavigateTab('support')}
-                          className="chat-action-btn"
-                        >
-                          <Heart size={13} />
-                          <span>Request Prayer</span>
-                        </button>
-
-                        <button
-                          onClick={() => onNavigateTab('discover')}
-                          className="chat-action-btn"
-                        >
-                          <HeartHandshake size={13} />
-                          <span>Helping Hands</span>
-                        </button>
+                    return (
+                      <div className="chat-actions-container">
+                        <span className="chat-actions-label">
+                          Suggested Based on Our Chat:
+                        </span>
+                        <div className="chat-actions-wrap">
+                          {theme === 'Gratitude & Joy' ? (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => onOpenDevotional(matchedDevotional)}
+                                className="chat-action-btn"
+                              >
+                                <BookOpen size={13} />
+                                <span>{scriptureLabel}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('support')}
+                                className="chat-action-btn"
+                              >
+                                <Heart size={13} />
+                                <span>Share a Praise</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateDiscoverPillar?.('testimonies')}
+                                className="chat-action-btn"
+                              >
+                                <Sparkles size={13} />
+                                <span>Stories of Hope</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('discover')}
+                                className="chat-action-btn"
+                              >
+                                <HeartHandshake size={13} />
+                                <span>Helping Hands</span>
+                              </button>
+                            </>
+                          ) : theme === 'Grief & Loss' ? (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => onOpenDevotional(matchedDevotional)}
+                                className="chat-action-btn"
+                              >
+                                <BookOpen size={13} />
+                                <span>{scriptureLabel}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('support')}
+                                className="chat-action-btn"
+                              >
+                                <Heart size={13} />
+                                <span>Request Prayer</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateDiscoverPillar?.('videos')}
+                                className="chat-action-btn"
+                              >
+                                <Sparkles size={13} />
+                                <span>Comforting Videos</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('discover')}
+                                className="chat-action-btn"
+                              >
+                                <HeartHandshake size={13} />
+                                <span>Helping Hands</span>
+                              </button>
+                            </>
+                          ) : theme === 'Burnout & Rest' ? (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => onOpenDevotional(matchedDevotional)}
+                                className="chat-action-btn"
+                              >
+                                <BookOpen size={13} />
+                                <span>{scriptureLabel}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateDiscoverPillar?.('professional')}
+                                className="chat-action-btn"
+                              >
+                                <Wind size={13} />
+                                <span>4-7-8 Breathing Calm</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('discover')}
+                                className="chat-action-btn"
+                              >
+                                <HeartHandshake size={13} />
+                                <span>Helping Hands</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('support')}
+                                className="chat-action-btn"
+                              >
+                                <Heart size={13} />
+                                <span>Request Prayer</span>
+                              </button>
+                            </>
+                          ) : theme === 'Parenting & Generational Healing' ? (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => onOpenDevotional(matchedDevotional)}
+                                className="chat-action-btn"
+                              >
+                                <BookOpen size={13} />
+                                <span>{scriptureLabel}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('discover')}
+                                className="chat-action-btn"
+                              >
+                                <HeartHandshake size={13} />
+                                <span>Helping Hands</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('support')}
+                                className="chat-action-btn"
+                              >
+                                <Heart size={13} />
+                                <span>Request Prayer</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateDiscoverPillar?.('videos')}
+                                className="chat-action-btn"
+                              >
+                                <Sparkles size={13} />
+                                <span>Parenting Videos</span>
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateDiscoverPillar?.('professional')}
+                                className="chat-action-btn"
+                              >
+                                <Wind size={13} />
+                                <span>4-7-8 Breathing Calm</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onOpenDevotional(matchedDevotional)}
+                                className="chat-action-btn"
+                              >
+                                <BookOpen size={13} />
+                                <span>{scriptureLabel}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('support')}
+                                className="chat-action-btn"
+                              >
+                                <Heart size={13} />
+                                <span>Request Prayer</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onNavigateTab('discover')}
+                                className="chat-action-btn"
+                              >
+                                <HeartHandshake size={13} />
+                                <span>Helping Hands</span>
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </div>
               )}
             </React.Fragment>

@@ -165,7 +165,62 @@ export function generateTriagePathways(
     };
   }
 
-  // 4. Anxiety, Panic, Restlessness, Fear (Default Fallback)
+  // 4. Positive / Gratitude / Joy / Blessed
+  const hasPositiveSignal =
+    lower.includes('lucky') ||
+    lower.includes('blessed') ||
+    lower.includes('happy') ||
+    lower.includes('grateful') ||
+    lower.includes('thankful') ||
+    lower.includes('joy') ||
+    lower.includes('excited') ||
+    lower.includes('awesome') ||
+    lower.includes('amazing') ||
+    lower.includes('good morning') ||
+    lower.includes('great day') ||
+    mood === 'happy' ||
+    mood === 'grateful' ||
+    mood === 'peaceful' ||
+    mood === 'hopeful';
+
+  const hasAnxietyOrDistress =
+    lower.includes('anxious') ||
+    lower.includes('anxiety') ||
+    lower.includes('panic') ||
+    lower.includes('worry') ||
+    lower.includes('worried') ||
+    lower.includes('stressed') ||
+    lower.includes('overwhelm') ||
+    lower.includes('scared') ||
+    lower.includes('lonely') ||
+    lower.includes('alone') ||
+    mood === 'anxious' ||
+    mood === 'overwhelmed' ||
+    mood === 'lonely';
+
+  if (hasPositiveSignal && !hasAnxietyOrDistress) {
+    const video = CURATED_VIDEOS[0];
+    const testimony = COMMUNITY_TESTIMONIES[0];
+    const prof = PROFESSIONAL_ARTICLES[0];
+
+    return {
+      compassionateAcknowledgment:
+        "What a sweet gift to celebrate these bright moments of joy and gratitude today. Noticing God's goodness in the everyday moments anchors your heart in peace.",
+      detectedTheme: 'Gratitude & Joy',
+      biblePathway: {
+        title: 'Renewed Strength for the Morning',
+        scriptureRef: 'Lamentations 3:22-23 (NIV)',
+        scriptureText: 'His compassions never fail. They are new every morning; great is your faithfulness.',
+        excerpt: 'Let your heart soak in today’s blessings with thanksgiving and quiet joy.',
+        devotionalId: 'dev-006',
+      },
+      videoPathway: video,
+      testimonyPathway: testimony,
+      professionalPathway: prof,
+    };
+  }
+
+  // 5. Anxiety, Panic, Restlessness, Fear (Default Fallback)
   const video = CURATED_VIDEOS.find((v) => v.id === 'vid-anxiety-01') || CURATED_VIDEOS[2];
   const testimony = COMMUNITY_TESTIMONIES.find((t) => t.id === 'test-02') || COMMUNITY_TESTIMONIES[1];
   const prof = PROFESSIONAL_ARTICLES.find((p) => p.id === 'prof-02') || PROFESSIONAL_ARTICLES[1];

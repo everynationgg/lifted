@@ -138,13 +138,6 @@ export const App: React.FC = () => {
     const lastCheckIn = localStorage.getItem('lifted_last_checkin_date');
     return isTodayLocal(lastCheckIn);
   });
-  const [lockedNotice, setLockedNotice] = useState<string | null>(null);
-
-  const showLockedHint = () => {
-    haptics.light();
-    setLockedNotice('Share a quick 2-message check-in with your guide first to unlock the rest of LIFTED.');
-    setTimeout(() => setLockedNotice(null), 3500);
-  };
 
   const handleCheckInComplete = () => {
     const todayStr = getLocalDateString();
@@ -153,7 +146,6 @@ export const App: React.FC = () => {
     } else {
       localStorage.setItem('lifted_last_checkin_date', todayStr);
     }
-    setLockedNotice(null);
     setHasCompletedCheckIn(true);
   };
 
@@ -767,46 +759,14 @@ export const App: React.FC = () => {
         <div className="mobile-frame">
           {/* Top Header */}
           <Header
-            showActions={true}
-            onOpenStoreModal={() => {
-              if (!hasCompletedCheckIn) {
-                showLockedHint();
-                return;
-              }
-              setIsStoreOpen(true);
-            }}
-            onOpenSettingsModal={() => {
-              if (!hasCompletedCheckIn) {
-                showLockedHint();
-                return;
-              }
-              setActiveTab('journey');
-            }}
+            showActions={hasCompletedCheckIn}
+            onOpenStoreModal={() => setIsStoreOpen(true)}
+            onOpenSettingsModal={() => setActiveTab('journey')}
             onNavigateHome={() => setActiveTab('home')}
             onSecretAdminTrigger={() => {
               setIsAdminLoginOpen(true);
             }}
           />
-
-          {lockedNotice && (
-            <div
-              role="status"
-              style={{
-                margin: '0 16px 8px',
-                padding: '9px 14px',
-                background: '#E0F2FE',
-                border: '1px solid #7DD3FC',
-                color: '#0369A1',
-                borderRadius: '12px',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                textAlign: 'center',
-                boxShadow: '0 4px 12px rgba(2, 132, 199, 0.12)',
-              }}
-            >
-              {lockedNotice}
-            </div>
-          )}
 
           {/* Main Content Area: Keep-Alive Preserves Tab State, Chat Memory & Scroll */}
           <main className="screen-scroll-container">
@@ -885,13 +845,13 @@ export const App: React.FC = () => {
             </div>
           </main>
 
-          {/* Four Primary Navigation Destinations Dock: Unlocks after 2-message check-in */}
-          <Navigation
-            activeTab={activeTab}
-            onSelectTab={(tab) => setActiveTab(tab)}
-            isUnlocked={hasCompletedCheckIn}
-            onLockedTabAttempt={() => showLockedHint()}
-          />
+          {/* Four Primary Navigation Destinations Dock: Hidden until 2-message check-in completes */}
+          {hasCompletedCheckIn && (
+            <Navigation
+              activeTab={activeTab}
+              onSelectTab={(tab) => setActiveTab(tab)}
+            />
+          )}
         </div>
       </div>
 
