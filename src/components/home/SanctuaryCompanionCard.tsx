@@ -13,7 +13,6 @@ import {
   Mic,
   MicOff,
   AlertCircle,
-  WifiOff,
 } from 'lucide-react';
 import type {
   MoodId,
@@ -34,7 +33,6 @@ import {
   type CompanionMode,
   type ChatHistoryItem,
 } from '../../services/geminiService';
-import { supabaseAuthService } from '../../services/auth/supabaseAuthService';
 import { CloudAiConsentModal } from '../CloudAiConsentModal';
 import { haptics } from '../../services/hapticsService';
 import { voiceService } from '../../services/voiceService';
@@ -129,8 +127,8 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
   const [isListening, setIsListening] = useState(false);
   const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
 
-  // Companion Mode & Cloud AI Consent State
-  const [companionMode, setCompanionModeState] = useState<CompanionMode>(() => {
+  // Companion Mode & Cloud AI Consent State (auto-enabled silently when preview key is configured)
+  const [, setCompanionModeState] = useState<CompanionMode>(() => {
     if (APP_CONFIG.flags.enableCloudAi && getLiveGeminiApiKey()) {
       if (!hasCloudAiConsent()) {
         setCloudAiConsent(true);
@@ -142,27 +140,6 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
   });
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
   const [cloudAiNotice, setCloudAiNotice] = useState<string | null>(null);
-
-  const handleToggleCompanionMode = () => {
-    if (companionMode === 'offline') {
-      const isAuthed = supabaseAuthService.getAccountState() === 'AUTHENTICATED';
-      const hasDirectKey = Boolean(getLiveGeminiApiKey());
-      if (!isAuthed && !hasDirectKey && !APP_CONFIG.flags.enableCloudAi) {
-        setCloudAiNotice('Sanctuary operates 100% privately and offline on your device. Live Gemini Cloud AI is planned for a future release with user consent.');
-        setTimeout(() => setCloudAiNotice(null), 5000);
-        return;
-      }
-      if (!hasCloudAiConsent()) {
-        setIsConsentModalOpen(true);
-        return;
-      }
-      setCompanionMode('cloud');
-      setCompanionModeState('cloud');
-    } else {
-      setCompanionMode('offline');
-      setCompanionModeState('offline');
-    }
-  };
 
   const handleConfirmConsent = () => {
     setCloudAiConsent(true);
@@ -391,36 +368,6 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
               <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--blue-accent-dark)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Compassionate Guide
               </span>
-              <button
-                type="button"
-                onClick={handleToggleCompanionMode}
-                title="Tap to toggle between Offline Sanctuary and Cloud AI"
-                style={{
-                  fontSize: '0.66rem',
-                  fontWeight: 600,
-                  padding: '2px 8px',
-                  borderRadius: '12px',
-                  border: companionMode === 'cloud' ? '1px solid #7DD3FC' : '1px solid #CBD5E1',
-                  background: companionMode === 'cloud' ? '#E0F2FE' : '#F8FAFC',
-                  color: companionMode === 'cloud' ? '#0369A1' : '#64748B',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                }}
-              >
-                {companionMode === 'cloud' ? (
-                  <>
-                    <Sparkles size={11} color="#0284C7" />
-                    <span>Cloud AI (Gemini)</span>
-                  </>
-                ) : (
-                  <>
-                    <WifiOff size={11} color="#64748B" />
-                    <span>Sanctuary (Offline)</span>
-                  </>
-                )}
-              </button>
             </div>
             <button
               onClick={handleResetCheckIn}
@@ -466,35 +413,6 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <Sparkles size={14} color="var(--blue-accent-dark)" />
                       <span className="chat-ai-avatar">Compassionate Guide</span>
-                      {msg.isAiGenerated ? (
-                        <span
-                          style={{
-                            fontSize: '0.64rem',
-                            fontWeight: 600,
-                            background: '#E0F2FE',
-                            color: '#0369A1',
-                            padding: '1px 6px',
-                            borderRadius: '8px',
-                            letterSpacing: '0.02em',
-                          }}
-                        >
-                          Cloud Reflection
-                        </span>
-                      ) : (
-                        <span
-                          style={{
-                            fontSize: '0.64rem',
-                            fontWeight: 500,
-                            background: '#F1F5F9',
-                            color: '#64748B',
-                            padding: '1px 6px',
-                            borderRadius: '8px',
-                            letterSpacing: '0.02em',
-                          }}
-                        >
-                          Sanctuary Companion
-                        </span>
-                      )}
                     </div>
                     <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{msg.timestamp}</span>
                   </div>
@@ -656,42 +574,6 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#92400E', padding: '2px' }}
           >
             <X size={14} />
-          </button>
-        </div>
-      )}
-
-      {/* Mode Selector Pill before conversation starts */}
-      {!isConversationActive && (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '2px 0 6px 0' }}>
-          <button
-            type="button"
-            onClick={handleToggleCompanionMode}
-            style={{
-              fontSize: '0.72rem',
-              fontWeight: 600,
-              padding: '4px 12px',
-              borderRadius: 'var(--radius-full, 9999px)',
-              border: companionMode === 'cloud' ? '1px solid #7DD3FC' : '1px solid #E2E8F0',
-              background: companionMode === 'cloud' ? '#E0F2FE' : '#FFFFFF',
-              color: companionMode === 'cloud' ? '#0369A1' : '#64748B',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-            }}
-          >
-            {companionMode === 'cloud' ? (
-              <>
-                <Sparkles size={12} color="#0284C7" />
-                <span>Mode: Cloud AI Guide (Gemini)</span>
-              </>
-            ) : (
-              <>
-                <WifiOff size={12} color="#64748B" />
-                <span>Mode: Sanctuary Companion (Offline)</span>
-              </>
-            )}
           </button>
         </div>
       )}
