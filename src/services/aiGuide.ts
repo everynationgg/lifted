@@ -67,8 +67,12 @@ export function generateTriagePathways(
 ): AiPathwayRecommendations {
   const lower = userText.toLowerCase();
 
-  // 1. Loss, Grief, Death, Heartbreak
+  // 1. Sadness, Loss, Grief, Death, Heartbreak
   if (
+    lower.includes('sad') ||
+    lower.includes('crying') ||
+    lower.includes('cry') ||
+    lower.includes('heartbroken') ||
     lower.includes('namatay') ||
     lower.includes('died') ||
     lower.includes('grief') ||
@@ -77,7 +81,10 @@ export function generateTriagePathways(
     lower.includes('heartbreak') ||
     lower.includes('breakup') ||
     lower.includes('partner') ||
-    mood === 'sad'
+    lower.includes('lonely') ||
+    lower.includes('alone') ||
+    mood === 'sad' ||
+    mood === 'lonely'
   ) {
     const video = CURATED_VIDEOS.find((v) => v.id === 'vid-grief-01') || CURATED_VIDEOS[0];
     const testimony = COMMUNITY_TESTIMONIES.find((t) => t.id === 'test-01') || COMMUNITY_TESTIMONIES[0];
@@ -165,7 +172,7 @@ export function generateTriagePathways(
     };
   }
 
-  // 4. Positive / Gratitude / Joy / Blessed
+  // 4. Positive / Gratitude / Joy / Rested
   const hasPositiveSignal =
     lower.includes('lucky') ||
     lower.includes('blessed') ||
@@ -176,8 +183,12 @@ export function generateTriagePathways(
     lower.includes('excited') ||
     lower.includes('awesome') ||
     lower.includes('amazing') ||
-    lower.includes('good morning') ||
-    lower.includes('great day') ||
+    lower.includes('nap') ||
+    lower.includes('rested') ||
+    lower.includes('refreshed') ||
+    lower.includes('chill') ||
+    lower.includes('good') ||
+    lower.includes('great') ||
     mood === 'happy' ||
     mood === 'grateful' ||
     mood === 'peaceful' ||
@@ -195,8 +206,7 @@ export function generateTriagePathways(
     lower.includes('lonely') ||
     lower.includes('alone') ||
     mood === 'anxious' ||
-    mood === 'overwhelmed' ||
-    mood === 'lonely';
+    mood === 'overwhelmed';
 
   if (hasPositiveSignal && !hasAnxietyOrDistress) {
     const video = CURATED_VIDEOS[0];

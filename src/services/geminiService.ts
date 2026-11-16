@@ -711,11 +711,15 @@ export async function sendCompanionMessage(
     };
   }
 
-  // Combine user messages across the chat so recommendations reflect the full conversation
-  const fullUserContext = [
-    ...history.filter((h) => h.role === 'user').map((h) => h.text),
-    currentText,
-  ].join(' ');
+  // Prioritize the latest user message when it expresses a clear mood or topic;
+  // otherwise fall back to the combined conversation history.
+  const latestHasClearSignal =
+    /(sad|grief|loss|died|cry|lonely|alone|anxious|anxiety|panic|worry|stressed|overwhelm|tired|exhausted|burnout|pagod|parenting|kids|child|angry|frustrated|lucky|blessed|happy|grateful|thankful|joy|nap|rest|good|great|awesome)/.test(
+      lower
+    );
+  const fullUserContext = latestHasClearSignal
+    ? currentText
+    : [...history.filter((h) => h.role === 'user').map((h) => h.text), currentText].join(' ');
 
   // Determine if resources were explicitly requested or if Turn 2+ reached
   const userRequestedResources =

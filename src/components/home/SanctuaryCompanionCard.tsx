@@ -357,6 +357,7 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
   };
 
   const isConversationActive = chatMessages.length > 0;
+  const latestAiMessageId = [...chatMessages].reverse().find((m) => m.sender === 'ai')?.id;
 
   return (
     <>
@@ -491,8 +492,8 @@ export const SanctuaryCompanionCard: React.FC<SanctuaryCompanionCardProps> = ({
                     </div>
                   )}
 
-                  {/* Dynamic Suggestions tailored to the conversation */}
-                  {msg.shouldShowResources && (() => {
+                  {/* Dynamic Suggestions tailored to the conversation (only shown on latest AI reply) */}
+                  {msg.shouldShowResources && msg.id === latestAiMessageId && (() => {
                     const pathways = msg.recommendation?.triagePathways;
                     const theme = pathways?.detectedTheme || 'Anxiety & Nervous System Calm';
                     const matchedDevotional =
